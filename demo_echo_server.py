@@ -20,11 +20,21 @@ def server():
         conn, addr = s.accept() #established connection with client
         message = ""
         while True:
-            part = conn.recv(16)
-            if len(part) == 0:
+            data = conn.recv(1)
+
+            if data == b'':
                 break
-            else:
-                message += part
+            if data == b'\n':
+                break
+            
+            message += data
+            
+            
+            # part = conn.recv(16)
+            # if len(part) == 0:
+            #     break
+            # else:
+            #     message += part
         message = conn.recv(16)
         if debug == 1: print(message)
 

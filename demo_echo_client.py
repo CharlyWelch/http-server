@@ -16,12 +16,22 @@ def client (message):
         print("Connection Failed")
     else:
 
-        s.send(str.encode(message))
+        msg = str.encode(message)
+
+        s.sendall(msg)
+
+        if eom == "close":
+            s.close()
+            return
+        elif eom == "LF"
+            s.send(str.encode("\n"))
+        
+        # s.send(str.encode(message))
 
         raw = s.recv(len(message))
-        result = raw.decode()
+        # result = raw.decode()
 
-        s.close()
+        # s.close()
 
         if result == message:
             print("Ok: got echo")
