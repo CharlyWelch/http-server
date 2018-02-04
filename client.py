@@ -16,15 +16,6 @@ def make_request(message):
     body = message + CRLF
     return head + CRLF + body + CRLF
 
-def parse_response(message):
-    """ parse the http response """
-    res = message.decode()
-    return res
-    
-def response_error(response):
-    # return a a well formed 500: Internal server error message
-    if response != message:
-        return "500: Internal server error"
 
 def client(eom, message):   
     """ Client-side socket """
@@ -41,8 +32,6 @@ def client(eom, message):
         packet = make_request(message)
         s.sendall(packet.encode())
 
-        result = parse_response( s )
-
         if eom == "close":
             s.close()
             return
@@ -50,22 +39,35 @@ def client(eom, message):
         elif eom == "LF":
             s.send(str.encode("\n"))
 
+        result = parse_response( s )  #I'm a bit lost between this and lines 46-54 
+
         buffer_length = 8
         message_complete = False
         response = ''
+        
         while not message_complete:
-            part = c.recv(buffer_length)
+            part = s.recv(buffer_length)
             response += part.decode('utf8')
             if len(part)< buffer_length:
                 break
-
-        message = response
-
+        
+        response_error(response, message)
+    
         s.close()
 
         print(message)
         return(message)
 
+
+def parse_response(message):
+    """ parse the http response """
+    result = message.decode()
+    return result
+    
+def response_error(response, message):
+    """ return a 500: Internal server error message """
+    if response != message:
+        return "500: Internal server error"
 
 if __name__ == "__main__": 
     

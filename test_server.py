@@ -3,11 +3,13 @@ import pytest
 
 from client import client
 
-class ClientTest(unittest.TestCase):
-
+class ServerTest(unittest.TestCase):
+    """ Tests for http server step 1 """
     def test_1(self):
-        pass
-
+        self.assertEqual(client("LF", "testOK"), "HTTP/1.1 200: OK")
+		
+    def test_2(self):
+        self.assertEqual(client("LF", "testError"), "HTTP/1.1 500: Internal Server Error")
 
 
 

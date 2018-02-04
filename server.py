@@ -1,22 +1,18 @@
 import socket
 
-debug = 0
-
-##### Part 1: update the server so that it: 
-# accumulates an incoming request into a variable
-# “logs” that request by printing it to stdout
-# returns a well-formed HTTP 200 response to the client.
+debug = False
 
 def server():
     """ Server side socket"""
     s = socket.socket()
-    if debug == 0: print(s)
+    if debug: print(s)
 
     host = socket.gethostname()
+    if debug: print(host)
+    
+    address = (host, 5000)
 
-    if debug == 0: print(host)
-
-    s.bind( (host, 5000) )
+    s.bind( address )
 
     s.listen(1)
 
@@ -24,31 +20,45 @@ def server():
 
         conn, addr = s.accept() 
 
-        print(conn)
+        if debug: print(conn)
+        
+        message = b''
+
+        while True:
+            data = conn.recv(1)
+
+            if data == b'':
+                break
+            if data == b'\n':
+                break
+
+            message += data
 
 
-    message = parse_request(conn)
+        strMessage = message.decode()
 
-def parse_request(socket):
-    parse_head(socket)
-    parse_body(socket)
-    pass
+        print(message)
 
-def parse_head(socket):
-    #request
-######### he's posting examples by 1 ########
-    #while get bytes:
-        #break on crlf
-    #header
-    #while get bytes
-        #break on crlf
-    #expect crlf
+        if strMessage == "testOK":
+            ok = response_ok()
+            conn.send(ok.encode())
 
-def parse_body(socket):
-    pass
-    # While get bytes:
-        # break on crlf
+        if strMessage == "testError":
+            error = response_error()
+            conn.send(error.encode())
 
-    #expect crlf
+        conn.close()
 
+        if message.decode() == 'q':
+            break
+
+def response_ok():
+    """ Return an OK response - for use if message is properly received """
+    return "HTTP/1.1 200: OK"
+
+def response_error():
+    """ Return an error response if message not properly received """
+    return "HTTP/1.1 500: Internal Server Error"
+
+    
 server()
