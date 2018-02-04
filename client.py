@@ -39,8 +39,6 @@ def client(eom, message):
         elif eom == "LF":
             s.send(str.encode("\n"))
 
-        result = parse_response( s )  #I'm a bit lost between this and lines 46-54 
-
         buffer_length = 8
         message_complete = False
         response = ''
@@ -52,11 +50,12 @@ def client(eom, message):
                 break
         
         response_error(response, message)
-    
+        result = parse_response(response)  
+
         s.close()
 
-        print(message)
-        return(message)
+        print(result)
+        return(result)
 
 
 def parse_response(message):
