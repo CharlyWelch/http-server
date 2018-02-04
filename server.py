@@ -2,6 +2,11 @@ import socket
 
 debug = 0
 
+##### Part 1: update the server so that it: 
+# accumulates an incoming request into a variable
+# “logs” that request by printing it to stdout
+# returns a well-formed HTTP 200 response to the client.
+
 def server():
     """ Server side socket"""
     s = socket.socket()
@@ -21,24 +26,29 @@ def server():
 
         print(conn)
 
-        message = b''
-        
-        while True:
-            data = conn.recv(1)
 
-            if data == b'':
-                break
+    message = parse_request(conn)
 
-            if data == b'\n':
-                break
-            
-            message += data
-            
-        conn.send(message)
+def parse_request(socket):
+    parse_head(socket)
+    parse_body(socket)
+    pass
 
-        conn.close()
+def parse_head(socket):
+    #request
+######### he's posting examples by 1 ########
+    #while get bytes:
+        #break on crlf
+    #header
+    #while get bytes
+        #break on crlf
+    #expect crlf
 
-        if message.decode() == "q":
-            break
+def parse_body(socket):
+    pass
+    # While get bytes:
+        # break on crlf
+
+    #expect crlf
 
 server()

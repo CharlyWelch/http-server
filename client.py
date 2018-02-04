@@ -1,24 +1,47 @@
 import sys
 import socket
 
-debug = 0 
+def make_request(message):
+    """ Build packet for http request """
+    host = socket.gethostname()
+    REQUEST = "GET"
+    VERSION = "HTTP/1.1"
+    CRLF = "\r\n"
 
-def client (eom, message):   
+    request = REQUEST + " " + VERSION + CRLF
+
+    headers = "Host: {0}".format(host) + CRLF
+
+    head = request + headers
+    body = message + CRLF
+    return head + CRLF + body + CRLF
+
+def parse_response(message):
+    """ parse the http response """
+    res = message.decode()
+    return res
+    
+def response_error(response):
+    # return a a well formed 500: Internal server error message
+    if response != message:
+        return "500: Internal server error"
+
+def client(eom, message):   
     """ Client-side socket """
 
     s = socket.socket()
-    if debug == 0: print(s)
 
     host = socket.gethostname()
-    if debug == 0: print(host)
 
     try: 
         s.connect( (host, 5000) )
     except:
         print("Connection Failed")
     else:
-        msg = str.encode(message)
-        s.sendall(msg)
+        packet = make_request(message)
+        s.sendall(packet.encode())
+
+        result = parse_response( s )
 
         if eom == "close":
             s.close()
@@ -26,23 +49,24 @@ def client (eom, message):
 
         elif eom == "LF":
             s.send(str.encode("\n"))
-        
-        raw = s.recv(len(message))
-        result = raw.decode()
+
+        buffer_length = 8
+        message_complete = False
+        response = ''
+        while not message_complete:
+            part = c.recv(buffer_length)
+            response += part.decode('utf8')
+            if len(part)< buffer_length:
+                break
+
+        message = response
+
         s.close()
 
-        print(result)
-
-        if result == message:
-            print("Ok: got echo")
-            return True
-        else:
-            print("Failed: received different message: " + result)
-            return False
+        print(message)
+        return(message)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) <= 2:
-        print("Usage: client end of message")
-    else:    
-        client(sys.argv[1], sys.argv[2])
+if __name__ == "__main__": 
+    
+    client(sys.argv[1], sys.argv[2])
